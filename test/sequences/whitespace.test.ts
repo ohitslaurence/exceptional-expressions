@@ -1,11 +1,12 @@
 import Sequences from '../../src/sequences';
+import Constants from '../../src/constants';
 import { formatInternalExpression } from '../../src/utils';
 
 /**
  * whitespace sequence test
  */
 describe('whitespace sequence test', () => {
-  const expression: string = '\\s';
+  const expression: string = Constants.whitespace;
 
   it('return correct expression given size as integer', () => {
     const sequence = Sequences.whitespace(3);
@@ -103,41 +104,5 @@ describe('whitespace sequence test', () => {
   it('returns correct regex given min as 0', () => {
     const sequence = Sequences.whitespace({ min: 0, max: 6 });
     expect(new RegExp(formatInternalExpression(sequence)).test('')).toBeTruthy();
-  });
-
-  it('throws error if not given integer or sequence param', () => {
-    expect(() => {
-      Sequences.whitespace('test string');
-    }).toThrowError('If you pass a primitive as a sequence parameter, it must be of type integer');
-  });
-
-  it('throws error if not given integer for size param', () => {
-    expect(() => {
-      Sequences.whitespace({ size: 'test string' });
-    }).toThrowError('Size must be an integer');
-  });
-
-  it('throws error if not given integer for min param', () => {
-    expect(() => {
-      Sequences.whitespace({ min: 'test string' });
-    }).toThrowError('Minimum must be an integer');
-  });
-
-  it('throws error if not given integer for max param', () => {
-    expect(() => {
-      Sequences.whitespace({ max: 'test string' });
-    }).toThrowError('Maximum must be an integer');
-  });
-
-  it('throws min error if not given integer for either max or min', () => {
-    expect(() => {
-      Sequences.whitespace({ max: 'test string', min: 'Another string' });
-    }).toThrowError('Minimum must be an integer');
-  });
-
-  it('throws error if min is greater than max', () => {
-    expect(() => {
-      Sequences.whitespace({ max: 2, min: 4 });
-    }).toThrowError('Minimum cannot be greater than the maximum');
   });
 });

@@ -1,11 +1,12 @@
 import Sequences from '../../src/sequences';
+import Constants from '../../src/constants';
 import { formatInternalExpression } from '../../src/utils';
 
 /**
  * newlines sequence test
  */
 describe('newlines sequence test', () => {
-  const expression: string = '\\r\\n';
+  const expression: string = Constants.newline;
 
   it('return correct expression given size as integer', () => {
     const sequence = Sequences.newlines(3);
@@ -90,7 +91,7 @@ describe('newlines sequence test', () => {
     const sequence = Sequences.newlines({ min: 3, max: 6 });
 
     expect(new RegExp(formatInternalExpression(sequence)).test('\n'.repeat(3))).toBeTruthy();
-    expect(new RegExp(formatInternalExpression(sequence)).test('\n'.repeat(6))).toBeTruthy();
+    expect(new RegExp(formatInternalExpression(sequence)).test('\r'.repeat(6))).toBeTruthy();
     expect(new RegExp(formatInternalExpression(sequence)).test('\n'.repeat(4))).toBeTruthy();
     expect(new RegExp(formatInternalExpression(sequence)).test('\n'.repeat(2))).toBeFalsy();
     expect(
@@ -103,41 +104,5 @@ describe('newlines sequence test', () => {
   it('returns correct regex given min as 0', () => {
     const sequence = Sequences.newlines({ min: 0, max: 6 });
     expect(new RegExp(formatInternalExpression(sequence)).test('')).toBeTruthy();
-  });
-
-  it('throws error if not given integer or sequence param', () => {
-    expect(() => {
-      Sequences.newlines('test string');
-    }).toThrowError('If you pass a primitive as a sequence parameter, it must be of type integer');
-  });
-
-  it('throws error if not given integer for size param', () => {
-    expect(() => {
-      Sequences.newlines({ size: 'test string' });
-    }).toThrowError('Size must be an integer');
-  });
-
-  it('throws error if not given integer for min param', () => {
-    expect(() => {
-      Sequences.newlines({ min: 'test string' });
-    }).toThrowError('Minimum must be an integer');
-  });
-
-  it('throws error if not given integer for max param', () => {
-    expect(() => {
-      Sequences.newlines({ max: 'test string' });
-    }).toThrowError('Maximum must be an integer');
-  });
-
-  it('throws min error if not given integer for either max or min', () => {
-    expect(() => {
-      Sequences.newlines({ max: 'test string', min: 'Another string' });
-    }).toThrowError('Minimum must be an integer');
-  });
-
-  it('throws error if min is greater than max', () => {
-    expect(() => {
-      Sequences.newlines({ max: 2, min: 4 });
-    }).toThrowError('Minimum cannot be greater than the maximum');
   });
 });

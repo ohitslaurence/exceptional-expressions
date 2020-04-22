@@ -1,3 +1,5 @@
+import Constants from './constants';
+
 const validateParameters: (params: ISequenceParams | any) => void = (params: ISequenceParams) => {
   if (!isSequenceParam(params) && !Number.isInteger(<any>params)) {
     throw new Error('If you pass a primitive as a sequence parameter, it must be of type integer');
@@ -31,7 +33,11 @@ const lengthFromParams = (params: ISequenceParams | any) => {
   return params.hasOwnProperty('size') || Number.isInteger(params);
 };
 
-const sequenceOfSize = (params: ISequenceParams | any, expression: string, brackets: boolean = true): string => {
+const sequenceOfSize = (
+  params: ISequenceParams | any,
+  expression: string,
+  brackets: boolean = true
+): string => {
   const length: number = params.size || params;
   if (!brackets) {
     return `~~${expression}{${length}}`;
@@ -42,12 +48,10 @@ const sequenceOfSize = (params: ISequenceParams | any, expression: string, brack
 const sequenceByBounds = (
   params: ISequenceParams | any,
   expression: string,
-  brackets: boolean = true,
-  defaultMin: number = 1,
-  defaultMax: string | number = ''
+  brackets: boolean = true
 ) => {
-  const min: number = params.min === undefined ? defaultMin : params.min;
-  const max: number | string = params.max === undefined ? defaultMax : params.max;
+  const min: number = params.min === undefined ? 1 : params.min;
+  const max: number | string = params.max === undefined ? '' : params.max;
 
   if (!brackets) {
     return `~~${expression}{${min},${max}}`;
@@ -65,7 +69,7 @@ export default {
   whitespace(params: ISequenceParams | any) {
     validateParameters(params);
 
-    const expression: string = '\\s';
+    const expression: string = Constants.whitespace;
 
     if (lengthFromParams(params)) {
       return sequenceOfSize(params, expression);
@@ -76,7 +80,7 @@ export default {
   newlines(params: ISequenceParams | any) {
     validateParameters(params);
 
-    const expression: string = '\\r\\n';
+    const expression: string = Constants.newline;
 
     if (lengthFromParams(params)) {
       return sequenceOfSize(params, expression);
@@ -98,13 +102,13 @@ export default {
   symbols(params: ISequenceParams | any) {
     validateParameters(params);
 
-    const expression: string = '\\W';
+    const expression: string = Constants.symbol;
 
     if (lengthFromParams(params)) {
-      return sequenceOfSize(params, expression);
+      return sequenceOfSize(params, expression, false);
     }
 
-    return sequenceByBounds(params, expression);
+    return sequenceByBounds(params, expression, false);
   },
   // words(params: ISequenceParams) {
   //   validateParameters(params, 'Minimum number of words cannot be greater than the max');
@@ -119,7 +123,7 @@ export default {
   anything(params: ISequenceParams | any) {
     validateParameters(params);
 
-    const expression: string = '.';
+    const expression: string = Constants.anything;
 
     if (lengthFromParams(params)) {
       return sequenceOfSize(params, expression, false);

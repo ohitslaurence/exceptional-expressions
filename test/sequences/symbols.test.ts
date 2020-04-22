@@ -1,11 +1,12 @@
 import Sequences from '../../src/sequences';
+import Constants from '../../src/constants';
 import { formatInternalExpression } from '../../src/utils';
 
 /**
  * symbols sequence test
  */
 describe('symbols sequence test', () => {
-  const expression: string = '\\W';
+  const expression: string = Constants.symbol;
 
   it('return correct expression given size as integer', () => {
     const sequence = Sequences.symbols(3);
@@ -13,10 +14,10 @@ describe('symbols sequence test', () => {
     const sequence3 = Sequences.symbols(12);
     const sequence4 = Sequences.symbols(0);
 
-    expect(sequence).toEqual(`~~[${expression}]{3}`);
-    expect(sequence2).toEqual(`~~[${expression}]{6}`);
-    expect(sequence3).toEqual(`~~[${expression}]{12}`);
-    expect(sequence4).toEqual(`~~[${expression}]{0}`);
+    expect(sequence).toEqual(`~~${expression}{3}`);
+    expect(sequence2).toEqual(`~~${expression}{6}`);
+    expect(sequence3).toEqual(`~~${expression}{12}`);
+    expect(sequence4).toEqual(`~~${expression}{0}`);
   });
 
   it('returns correct regex given size', () => {
@@ -32,7 +33,7 @@ describe('symbols sequence test', () => {
   it('returns correct expression given size as property', () => {
     const sequence = Sequences.symbols({ size: 3 });
 
-    expect(sequence).toEqual(`~~[${expression}]{3}`);
+    expect(sequence).toEqual(`~~${expression}{3}`);
   });
 
   it('returns correct regex given size as property', () => {
@@ -44,13 +45,13 @@ describe('symbols sequence test', () => {
   it('size overrides min/max', () => {
     const sequence = Sequences.symbols({ size: 3, min: 2, max: 6 });
 
-    expect(sequence).toEqual(`~~[${expression}]{3}`);
+    expect(sequence).toEqual(`~~${expression}{3}`);
   });
 
   it('defaults min to 1', () => {
     const sequence = Sequences.symbols({ max: 3 });
 
-    expect(sequence).toEqual(`~~[${expression}]{1,3}`);
+    expect(sequence).toEqual(`~~${expression}{1,3}`);
   });
 
   it('returns correct regex given only max', () => {
@@ -69,7 +70,7 @@ describe('symbols sequence test', () => {
   it('defaults max to unlimited', () => {
     const sequence = Sequences.symbols({ min: 3 });
 
-    expect(sequence).toEqual(`~~[${expression}]{3,}`);
+    expect(sequence).toEqual(`~~${expression}{3,}`);
   });
 
   it('returns correct regex given only min', () => {
@@ -80,10 +81,18 @@ describe('symbols sequence test', () => {
     expect(new RegExp(formatInternalExpression(sequence)).test('@'.repeat(20))).toBeTruthy();
   });
 
+  it('Matches every symbol', () => {
+    const sequence = Sequences.symbols(33);
+
+    expect(
+      new RegExp(formatInternalExpression(sequence)).test('!@#$%^&*()_-+={}[]:;"\'|<>,.?/~`±§')
+    ).toBeTruthy();
+  });
+
   it('bounds the expression if min and max provided', () => {
     const sequence = Sequences.symbols({ min: 3, max: 6 });
 
-    expect(sequence).toEqual(`~~[${expression}]{3,6}`);
+    expect(sequence).toEqual(`~~${expression}{3,6}`);
   });
 
   it('returns correct regex given bounds', () => {
@@ -103,41 +112,5 @@ describe('symbols sequence test', () => {
   it('returns correct regex given min as 0', () => {
     const sequence = Sequences.symbols({ min: 0, max: 6 });
     expect(new RegExp(formatInternalExpression(sequence)).test('')).toBeTruthy();
-  });
-
-  it('throws error if not given integer or sequence param', () => {
-    expect(() => {
-      Sequences.symbols('test string');
-    }).toThrowError('If you pass a primitive as a sequence parameter, it must be of type integer');
-  });
-
-  it('throws error if not given integer for size param', () => {
-    expect(() => {
-      Sequences.symbols({ size: 'test string' });
-    }).toThrowError('Size must be an integer');
-  });
-
-  it('throws error if not given integer for min param', () => {
-    expect(() => {
-      Sequences.symbols({ min: 'test string' });
-    }).toThrowError('Minimum must be an integer');
-  });
-
-  it('throws error if not given integer for max param', () => {
-    expect(() => {
-      Sequences.symbols({ max: 'test string' });
-    }).toThrowError('Maximum must be an integer');
-  });
-
-  it('throws min error if not given integer for either max or min', () => {
-    expect(() => {
-      Sequences.symbols({ max: 'test string', min: 'Another string' });
-    }).toThrowError('Minimum must be an integer');
-  });
-
-  it('throws error if min is greater than max', () => {
-    expect(() => {
-      Sequences.symbols({ max: 2, min: 4 });
-    }).toThrowError('Minimum cannot be greater than the maximum');
   });
 });

@@ -1,11 +1,12 @@
 import Sequences from '../../src/sequences';
+import Constants from '../../src/constants';
 import { formatInternalExpression } from '../../src/utils';
 
 /**
  * anything sequence test
  */
 describe('anything sequence test', () => {
-  const expression: string = '.';
+  const expression: string = Constants.anything;
 
   it('return correct expression given size as integer', () => {
     const sequence = Sequences.anything(3);
@@ -24,9 +25,9 @@ describe('anything sequence test', () => {
     const sequence2 = Sequences.anything(6);
 
     expect(new RegExp(formatInternalExpression(sequence)).test('4'.repeat(3))).toBeTruthy();
-    expect(new RegExp(formatInternalExpression(sequence)).test('5'.repeat(2))).toBeFalsy();
-    expect(new RegExp(formatInternalExpression(sequence2)).test('4'.repeat(6))).toBeTruthy();
-    expect(new RegExp(formatInternalExpression(sequence2)).test('3'.repeat(2))).toBeFalsy();
+    expect(new RegExp(formatInternalExpression(sequence)).test('$'.repeat(2))).toBeFalsy();
+    expect(new RegExp(formatInternalExpression(sequence2)).test('t'.repeat(6))).toBeTruthy();
+    expect(new RegExp(formatInternalExpression(sequence2)).test('F'.repeat(2))).toBeFalsy();
   });
 
   it('returns correct expression given size as property', () => {
@@ -38,7 +39,7 @@ describe('anything sequence test', () => {
   it('returns correct regex given size as property', () => {
     const sequence = Sequences.anything({ size: 3 });
 
-    expect(new RegExp(formatInternalExpression(sequence)).test('234')).toBeTruthy();
+    expect(new RegExp(formatInternalExpression(sequence)).test('2F$')).toBeTruthy();
   });
 
   it('size overrides min/max', () => {
@@ -57,11 +58,11 @@ describe('anything sequence test', () => {
     const sequence = Sequences.anything({ max: 6 });
 
     expect(new RegExp(formatInternalExpression(sequence)).test('')).toBeFalsy();
-    expect(new RegExp(formatInternalExpression(sequence)).test('4'.repeat(2))).toBeTruthy();
+    expect(new RegExp(formatInternalExpression(sequence)).test('R'.repeat(2))).toBeTruthy();
     expect(new RegExp(formatInternalExpression(sequence)).test('5'.repeat(3))).toBeTruthy();
     expect(
       new RegExp('test' + formatInternalExpression(sequence) + 'test').test(
-        'test' + '4'.repeat(20) + 'test'
+        'test' + 'R'.repeat(20) + 'test'
       )
     ).toBeFalsy();
   });
@@ -75,8 +76,8 @@ describe('anything sequence test', () => {
   it('returns correct regex given only min', () => {
     const sequence = Sequences.anything({ min: 3 });
 
-    expect(new RegExp(formatInternalExpression(sequence)).test('6'.repeat(2))).toBeFalsy();
-    expect(new RegExp(formatInternalExpression(sequence)).test('3'.repeat(3))).toBeTruthy();
+    expect(new RegExp(formatInternalExpression(sequence)).test('$'.repeat(2))).toBeFalsy();
+    expect(new RegExp(formatInternalExpression(sequence)).test('T'.repeat(3))).toBeTruthy();
     expect(new RegExp(formatInternalExpression(sequence)).test('2'.repeat(20))).toBeTruthy();
   });
 
@@ -90,8 +91,8 @@ describe('anything sequence test', () => {
     const sequence = Sequences.anything({ min: 3, max: 6 });
 
     expect(new RegExp(formatInternalExpression(sequence)).test('6'.repeat(3))).toBeTruthy();
-    expect(new RegExp(formatInternalExpression(sequence)).test('7'.repeat(6))).toBeTruthy();
-    expect(new RegExp(formatInternalExpression(sequence)).test('8'.repeat(4))).toBeTruthy();
+    expect(new RegExp(formatInternalExpression(sequence)).test('#'.repeat(6))).toBeTruthy();
+    expect(new RegExp(formatInternalExpression(sequence)).test('W'.repeat(4))).toBeTruthy();
     expect(new RegExp(formatInternalExpression(sequence)).test('9'.repeat(2))).toBeFalsy();
     expect(
       new RegExp('test' + formatInternalExpression(sequence) + 'test').test(
@@ -103,41 +104,5 @@ describe('anything sequence test', () => {
   it('returns correct regex given min as 0', () => {
     const sequence = Sequences.anything({ min: 0, max: 6 });
     expect(new RegExp(formatInternalExpression(sequence)).test('')).toBeTruthy();
-  });
-
-  it('throws error if not given integer or sequence param', () => {
-    expect(() => {
-      Sequences.anything('test string');
-    }).toThrowError('If you pass a primitive as a sequence parameter, it must be of type integer');
-  });
-
-  it('throws error if not given integer for size param', () => {
-    expect(() => {
-      Sequences.anything({ size: 'test string' });
-    }).toThrowError('Size must be an integer');
-  });
-
-  it('throws error if not given integer for min param', () => {
-    expect(() => {
-      Sequences.anything({ min: 'test string' });
-    }).toThrowError('Minimum must be an integer');
-  });
-
-  it('throws error if not given integer for max param', () => {
-    expect(() => {
-      Sequences.anything({ max: 'test string' });
-    }).toThrowError('Maximum must be an integer');
-  });
-
-  it('throws min error if not given integer for either max or min', () => {
-    expect(() => {
-      Sequences.anything({ max: 'test string', min: 'Another string' });
-    }).toThrowError('Minimum must be an integer');
-  });
-
-  it('throws error if min is greater than max', () => {
-    expect(() => {
-      Sequences.anything({ max: 2, min: 4 });
-    }).toThrowError('Minimum cannot be greater than the maximum');
   });
 });
