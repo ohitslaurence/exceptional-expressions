@@ -1,23 +1,28 @@
 import Constants from '../../src/constants';
+import { formatInternalExpression } from '../../src/utils';
 
 /**
  * number constant test
  */
 describe('number constant test', () => {
+  const expression: string = formatInternalExpression(Constants.number);
+
   it('correctly matches a global digit', () => {
-    const regex: RegExp = new RegExp(Constants.number);
+    const regex: RegExp = new RegExp(expression);
 
     expect(regex.test('this is a test string 6')).toBeTruthy();
     expect(regex.test('this is a test string')).toBeFalsy();
   });
+
   it('correctly matches a digit in a sequence', () => {
-    const regex: RegExp = new RegExp(`test${Constants.number}test`);
+    const regex: RegExp = new RegExp(`test${expression}test`);
 
     expect(regex.test('test4test')).toBeTruthy();
     expect(regex.test('4test')).toBeFalsy();
   });
+
   it('has the correct number of matches in a sequence', () => {
-    const regex: RegExp = new RegExp(`${Constants.number}`, 'g');
+    const regex: RegExp = new RegExp(`${expression}`, 'g');
 
     let match: Array<string> = 'This is a test 912 string'.match(regex) as Array<string>;
     expect(match.length).toEqual(3);

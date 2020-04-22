@@ -10,10 +10,10 @@ describe('sequence parameter validation test', () => {
     }).toThrowError('If you pass a primitive as a sequence parameter, it must be of type integer');
   });
 
-  it('throws error if not given integer for size param', () => {
+  it('throws error if not given integer for length param', () => {
     expect(() => {
-      Sequences.numbers({ size: 'test string' });
-    }).toThrowError('Size must be an integer');
+      Sequences.numbers({ length: 'test string' });
+    }).toThrowError('Length must be an integer');
   });
 
   it('throws error if not given integer for min param', () => {

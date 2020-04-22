@@ -6,9 +6,9 @@ import { formatInternalExpression } from '../../src/utils';
  * whitespace sequence test
  */
 describe('whitespace sequence test', () => {
-  const expression: string = Constants.whitespace;
+  const expression: string = formatInternalExpression(Constants.whitespace);
 
-  it('return correct expression given size as integer', () => {
+  it('return correct expression given length as integer', () => {
     const sequence = Sequences.whitespace(3);
     const sequence2 = Sequences.whitespace(6);
     const sequence3 = Sequences.whitespace(12);
@@ -20,7 +20,7 @@ describe('whitespace sequence test', () => {
     expect(sequence4).toEqual(`~~[${expression}]{0}`);
   });
 
-  it('returns correct regex given size', () => {
+  it('returns correct regex given length', () => {
     const sequence = Sequences.whitespace(3);
     const sequence2 = Sequences.whitespace(6);
 
@@ -30,20 +30,20 @@ describe('whitespace sequence test', () => {
     expect(new RegExp(formatInternalExpression(sequence2)).test(' '.repeat(2))).toBeFalsy();
   });
 
-  it('returns correct expression given size as property', () => {
-    const sequence = Sequences.whitespace({ size: 3 });
+  it('returns correct expression given length as property', () => {
+    const sequence = Sequences.whitespace({ length: 3 });
 
     expect(sequence).toEqual(`~~[${expression}]{3}`);
   });
 
-  it('returns correct regex given size as property', () => {
-    const sequence = Sequences.whitespace({ size: 3 });
+  it('returns correct regex given length as property', () => {
+    const sequence = Sequences.whitespace({ length: 3 });
 
     expect(new RegExp(formatInternalExpression(sequence)).test(' '.repeat(3))).toBeTruthy();
   });
 
-  it('size overrides min/max', () => {
-    const sequence = Sequences.whitespace({ size: 3, min: 2, max: 6 });
+  it('length overrides min/max', () => {
+    const sequence = Sequences.whitespace({ length: 3, min: 2, max: 6 });
 
     expect(sequence).toEqual(`~~[${expression}]{3}`);
   });
@@ -61,9 +61,7 @@ describe('whitespace sequence test', () => {
     expect(new RegExp(formatInternalExpression(sequence)).test(' '.repeat(2))).toBeTruthy();
     expect(new RegExp(formatInternalExpression(sequence)).test(' '.repeat(3))).toBeTruthy();
     expect(
-      new RegExp('test' + formatInternalExpression(sequence) + 'test').test(
-        'test' + ' '.repeat(20) + 'test'
-      )
+      new RegExp('test' + sequence + 'test').test('test' + ' '.repeat(20) + 'test')
     ).toBeFalsy();
   });
 
@@ -75,10 +73,11 @@ describe('whitespace sequence test', () => {
 
   it('returns correct regex given only min', () => {
     const sequence = Sequences.whitespace({ min: 3 });
+    const regex: RegExp = new RegExp(formatInternalExpression(sequence));
 
-    expect(new RegExp(formatInternalExpression(sequence)).test(' '.repeat(2))).toBeFalsy();
-    expect(new RegExp(formatInternalExpression(sequence)).test(' '.repeat(3))).toBeTruthy();
-    expect(new RegExp(formatInternalExpression(sequence)).test(' '.repeat(20))).toBeTruthy();
+    expect(regex.test(' '.repeat(2))).toBeFalsy();
+    expect(regex.test(' '.repeat(3))).toBeTruthy();
+    expect(regex.test(' '.repeat(20))).toBeTruthy();
   });
 
   it('bounds the expression if min and max provided', () => {
@@ -89,15 +88,14 @@ describe('whitespace sequence test', () => {
 
   it('returns correct regex given bounds', () => {
     const sequence = Sequences.whitespace({ min: 3, max: 6 });
+    const regex: RegExp = new RegExp(formatInternalExpression(sequence));
 
-    expect(new RegExp(formatInternalExpression(sequence)).test(' '.repeat(3))).toBeTruthy();
-    expect(new RegExp(formatInternalExpression(sequence)).test(' '.repeat(6))).toBeTruthy();
-    expect(new RegExp(formatInternalExpression(sequence)).test(' '.repeat(4))).toBeTruthy();
-    expect(new RegExp(formatInternalExpression(sequence)).test(' '.repeat(2))).toBeFalsy();
+    expect(regex.test(' '.repeat(3))).toBeTruthy();
+    expect(regex.test(' '.repeat(6))).toBeTruthy();
+    expect(regex.test(' '.repeat(4))).toBeTruthy();
+    expect(regex.test(' '.repeat(2))).toBeFalsy();
     expect(
-      new RegExp('test' + formatInternalExpression(sequence) + 'test').test(
-        'test' + ' '.repeat(7) + 'test'
-      )
+      new RegExp('test' + sequence + 'test').test('test' + ' '.repeat(7) + 'test')
     ).toBeFalsy();
   });
 

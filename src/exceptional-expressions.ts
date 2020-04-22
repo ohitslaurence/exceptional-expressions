@@ -1,12 +1,23 @@
 // Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
 // import "core-js/fn/array.find"
 // ...
+import { matches } from './utils';
 export default class ExpressionBuilder {
   private beginsWithExpression: string = '';
   private internal: Array<string> = [];
   private endsWithExpression: string = '';
 
-  public getRegularExpression() {
+  public restore(): void {
+    this.beginsWithExpression = '';
+    this.endsWithExpression = '';
+    this.internal = [];
+  }
+
+  public matchesString(string: string) {
+    return matches(string, this.toRegex());
+  }
+
+  public toRegex(): RegExp {
     return this.buildExpression();
   }
 
@@ -51,18 +62,23 @@ export default class ExpressionBuilder {
     return string.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&').replace(/-/g, '\\u002d');
   }
 
-  private insertExpression(string: string) : string {
+  private insertExpression(string: string): string {
     if (this.isInternalRegex(string)) {
       return this.formatInternalExpression(string);
     }
     return this.escapeString(string);
   }
 
-  private isInternalRegex(string: string) : boolean {
-    return typeof string === 'string' && string.length > 2 && string.charAt(0) === '~' && string.charAt(1) === '~';
+  private isInternalRegex(string: string): boolean {
+    return (
+      typeof string === 'string' &&
+      string.length > 2 &&
+      string.charAt(0) === '~' &&
+      string.charAt(1) === '~'
+    );
   }
 
-  private formatInternalExpression(string: string) : string {
+  private formatInternalExpression(string: string): string {
     return string.substring(2);
   }
 }

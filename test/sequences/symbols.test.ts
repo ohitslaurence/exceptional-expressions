@@ -6,9 +6,9 @@ import { formatInternalExpression } from '../../src/utils';
  * symbols sequence test
  */
 describe('symbols sequence test', () => {
-  const expression: string = Constants.symbol;
+  const expression: string = formatInternalExpression(Constants.symbol);
 
-  it('return correct expression given size as integer', () => {
+  it('return correct expression given length as integer', () => {
     const sequence = Sequences.symbols(3);
     const sequence2 = Sequences.symbols(6);
     const sequence3 = Sequences.symbols(12);
@@ -20,7 +20,7 @@ describe('symbols sequence test', () => {
     expect(sequence4).toEqual(`~~${expression}{0}`);
   });
 
-  it('returns correct regex given size', () => {
+  it('returns correct regex given length', () => {
     const sequence = Sequences.symbols(3);
     const sequence2 = Sequences.symbols(6);
 
@@ -30,20 +30,20 @@ describe('symbols sequence test', () => {
     expect(new RegExp(formatInternalExpression(sequence2)).test('&'.repeat(2))).toBeFalsy();
   });
 
-  it('returns correct expression given size as property', () => {
-    const sequence = Sequences.symbols({ size: 3 });
+  it('returns correct expression given length as property', () => {
+    const sequence = Sequences.symbols({ length: 3 });
 
     expect(sequence).toEqual(`~~${expression}{3}`);
   });
 
-  it('returns correct regex given size as property', () => {
-    const sequence = Sequences.symbols({ size: 3 });
+  it('returns correct regex given length as property', () => {
+    const sequence = Sequences.symbols({ length: 3 });
 
     expect(new RegExp(formatInternalExpression(sequence)).test('!)#')).toBeTruthy();
   });
 
-  it('size overrides min/max', () => {
-    const sequence = Sequences.symbols({ size: 3, min: 2, max: 6 });
+  it('length overrides min/max', () => {
+    const sequence = Sequences.symbols({ length: 3, min: 2, max: 6 });
 
     expect(sequence).toEqual(`~~${expression}{3}`);
   });
@@ -61,9 +61,7 @@ describe('symbols sequence test', () => {
     expect(new RegExp(formatInternalExpression(sequence)).test('#'.repeat(2))).toBeTruthy();
     expect(new RegExp(formatInternalExpression(sequence)).test('$'.repeat(3))).toBeTruthy();
     expect(
-      new RegExp('test' + formatInternalExpression(sequence) + 'test').test(
-        'test' + '$'.repeat(20) + 'test'
-      )
+      new RegExp('test' + sequence + 'test').test('test' + '$'.repeat(20) + 'test')
     ).toBeFalsy();
   });
 
@@ -103,9 +101,7 @@ describe('symbols sequence test', () => {
     expect(new RegExp(formatInternalExpression(sequence)).test('('.repeat(4))).toBeTruthy();
     expect(new RegExp(formatInternalExpression(sequence)).test('*'.repeat(2))).toBeFalsy();
     expect(
-      new RegExp('test' + formatInternalExpression(sequence) + 'test').test(
-        'test' + '&'.repeat(7) + 'test'
-      )
+      new RegExp('test' + sequence + 'test').test('test' + '&'.repeat(7) + 'test')
     ).toBeFalsy();
   });
 

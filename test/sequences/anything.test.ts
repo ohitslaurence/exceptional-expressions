@@ -6,9 +6,9 @@ import { formatInternalExpression } from '../../src/utils';
  * anything sequence test
  */
 describe('anything sequence test', () => {
-  const expression: string = Constants.anything;
+  const expression: string = formatInternalExpression(Constants.anything);
 
-  it('return correct expression given size as integer', () => {
+  it('return correct expression given length as integer', () => {
     const sequence = Sequences.anything(3);
     const sequence2 = Sequences.anything(6);
     const sequence3 = Sequences.anything(12);
@@ -20,7 +20,7 @@ describe('anything sequence test', () => {
     expect(sequence4).toEqual(`~~${expression}{0}`);
   });
 
-  it('returns correct regex given size', () => {
+  it('returns correct regex given length', () => {
     const sequence = Sequences.anything(3);
     const sequence2 = Sequences.anything(6);
 
@@ -30,20 +30,20 @@ describe('anything sequence test', () => {
     expect(new RegExp(formatInternalExpression(sequence2)).test('F'.repeat(2))).toBeFalsy();
   });
 
-  it('returns correct expression given size as property', () => {
-    const sequence = Sequences.anything({ size: 3 });
+  it('returns correct expression given length as property', () => {
+    const sequence = Sequences.anything({ length: 3 });
 
     expect(sequence).toEqual(`~~${expression}{3}`);
   });
 
-  it('returns correct regex given size as property', () => {
-    const sequence = Sequences.anything({ size: 3 });
+  it('returns correct regex given length as property', () => {
+    const sequence = Sequences.anything({ length: 3 });
 
     expect(new RegExp(formatInternalExpression(sequence)).test('2F$')).toBeTruthy();
   });
 
-  it('size overrides min/max', () => {
-    const sequence = Sequences.anything({ size: 3, min: 2, max: 6 });
+  it('length overrides min/max', () => {
+    const sequence = Sequences.anything({ length: 3, min: 2, max: 6 });
 
     expect(sequence).toEqual(`~~${expression}{3}`);
   });
@@ -61,9 +61,7 @@ describe('anything sequence test', () => {
     expect(new RegExp(formatInternalExpression(sequence)).test('R'.repeat(2))).toBeTruthy();
     expect(new RegExp(formatInternalExpression(sequence)).test('5'.repeat(3))).toBeTruthy();
     expect(
-      new RegExp('test' + formatInternalExpression(sequence) + 'test').test(
-        'test' + 'R'.repeat(20) + 'test'
-      )
+      new RegExp('test' + sequence + 'test').test('test' + 'R'.repeat(20) + 'test')
     ).toBeFalsy();
   });
 
@@ -95,9 +93,7 @@ describe('anything sequence test', () => {
     expect(new RegExp(formatInternalExpression(sequence)).test('W'.repeat(4))).toBeTruthy();
     expect(new RegExp(formatInternalExpression(sequence)).test('9'.repeat(2))).toBeFalsy();
     expect(
-      new RegExp('test' + formatInternalExpression(sequence) + 'test').test(
-        'test' + ' '.repeat(7) + 'test'
-      )
+      new RegExp('test' + sequence + 'test').test('test' + ' '.repeat(7) + 'test')
     ).toBeFalsy();
   });
 

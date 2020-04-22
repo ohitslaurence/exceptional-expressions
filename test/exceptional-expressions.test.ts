@@ -2,14 +2,14 @@ import ExpressionBuilder from '../src/exceptional-expressions';
 import Sequences from '../src/sequences';
 
 /**
- * Dummy test
+ * ExpressionBuilder test
  */
-describe('Dummy test', () => {
+describe('ExpressionBuilder test', () => {
   it('works if true is truthy', () => {
     expect(true).toBeTruthy();
   });
 
-  it('DummyClass is instantiable', () => {
+  it('ExpressionBuilder is instantiable', () => {
     expect(new ExpressionBuilder()).toBeInstanceOf(ExpressionBuilder);
   });
 
