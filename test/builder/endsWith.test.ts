@@ -3,13 +3,13 @@ import Constants from '../../src/constants';
 import Sequences from '../../src/sequences';
 
 /**
- * beginsWith test
+ * endsWith test
  */
-describe('beginsWith test', () => {
+describe('endsWith test', () => {
   let builder: ExpressionBuilder = new ExpressionBuilder();
 
   beforeEach(() => {
-    builder.restore();
+    builder.reset();
   });
 
   it('doesnt output regex if nothing provided', () => {
@@ -33,5 +33,20 @@ describe('beginsWith test', () => {
     expect(builder.matchesString('1234')).toBeTruthy();
     expect(builder.matchesString('!@#$ And some more strings1234')).toBeTruthy();
     expect(builder.matchesString('!ThisIsATestString')).toBeFalsy();
+  });
+
+  it('correctly outputs sequence with optional ending matcher', () => {
+    builder.endsWith(Sequences.numbers(4), true);
+
+    expect(builder.matchesString('hello 1234')).toBeTruthy();
+    expect(builder.matchesString('nd some more strings')).toBeTruthy();
+  });
+
+  it('optionallyBeginsWith returns endsWith with optional = true', () => {
+    builder.optionallyEndsWith(Sequences.numbers(4));
+
+    expect(builder.matchesString('hello 1234')).toBeTruthy();
+    expect(builder.matchesString('nd some more strings')).toBeTruthy();
+    expect(builder.toRegex()).toEqual(/(?:[\d]{4})?$/g);
   });
 });

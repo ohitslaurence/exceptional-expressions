@@ -9,7 +9,7 @@ describe('beginsWith test', () => {
   let builder: ExpressionBuilder = new ExpressionBuilder();
 
   beforeEach(() => {
-    builder.restore();
+    builder.reset();
   });
 
   it('doesnt output regex if nothing provided', () => {
@@ -29,10 +29,38 @@ describe('beginsWith test', () => {
 
   it('correctly outputs sequence with beginning matcher', () => {
     builder.beginsWith(Sequences.symbols(4));
-    const regex: RegExp = builder.toRegex();
 
     expect(builder.matchesString('$$$$')).toBeTruthy();
     expect(builder.matchesString('!@#$ And some more strings')).toBeTruthy();
     expect(builder.matchesString('!ThisIsATestString')).toBeFalsy();
+  });
+
+  it('correctly outputs sequence with optional beginning matcher', () => {
+    builder.beginsWith(Sequences.numbers(4), true);
+
+    expect(builder.matchesString('1234')).toBeTruthy();
+    expect(builder.matchesString('nd some more strings')).toBeTruthy();
+  });
+
+  it('optionallyBeginsWith returns beginsWith with optional = true', () => {
+    builder.optionallyBeginsWith(Sequences.numbers(4));
+
+    expect(builder.matchesString('1234')).toBeTruthy();
+    expect(builder.matchesString('nd some more strings')).toBeTruthy();
+    expect(builder.toRegex()).toEqual(/^(?:[\d]{4})?/g);
+  });
+
+  it('orBeginsWith throws error if no begins with', () => {
+    expect(() => {
+      builder.orBeginsWith('something');
+    }).toThrowError('orBeginsWith must be preceeded by a beginsWith statement');
+  });
+
+  it('orBeginsWith wraps begin statements', () => {
+    builder.beginsWith(Sequences.numbers(4)).orBeginsWith('hello');
+
+    expect(builder.matchesString('1234')).toBeTruthy();
+    expect(builder.matchesString('hello')).toBeTruthy();
+    expect(builder.matchesString('1')).toBeFalsy();
   });
 });

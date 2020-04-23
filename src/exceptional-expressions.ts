@@ -1,84 +1,98 @@
-// Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
-// import "core-js/fn/array.find"
-// ...
-import { matches } from './utils';
+import { matches, handleOptionalWrapping, validateExpression, wrapOrExpression } from './utils';
 export default class ExpressionBuilder {
   private beginsWithExpression: string = '';
   private internal: Array<string> = [];
   private endsWithExpression: string = '';
 
-  public restore(): void {
-    this.beginsWithExpression = '';
-    this.endsWithExpression = '';
-    this.internal = [];
-  }
-
-  public matchesString(string: string) {
-    return matches(string, this.toRegex());
+  public matchesString(string: string): boolean {
+    return matches(string, this.buildExpression());
   }
 
   public toRegex(): RegExp {
     return this.buildExpression();
   }
 
-  private buildExpression() {
-    const start = this.beginsWithExpression.length ? `^${this.beginsWithExpression}` : '';
-    const end = this.endsWithExpression.length ? `${this.endsWithExpression}$` : '';
-
-    return new RegExp(`${start}${end}`, 'g');
+  public reset(): void {
+    this.beginsWithExpression = '';
+    this.endsWithExpression = '';
+    this.internal = [];
   }
 
-  public followedBy(expression: any): ExpressionBuilder {
-    this.internal.push(this.insertExpression(expression));
-    return this;
+  private buildExpression(): RegExp {
+    const start: string = this.beginsWithExpression.length ? `^${this.beginsWithExpression}` : '';
+    const internal: string = this.internal.reduce((total, expression) => {
+      return total + expression;
+    }, '');
+    const end: string = this.endsWithExpression.length ? `${this.endsWithExpression}$` : '';
+
+    return new RegExp(`${start}${internal}${end}`, 'g');
   }
 
-  public endsWith(expression: any): ExpressionBuilder {
-    this.endsWithExpression = this.insertExpression(expression);
-    return this;
+  public optionallyFollowedBy(expression: any): ExpressionBuilder {
+    return this.followedBy(expression, true);
   }
 
-  /**
-   * Set expression to match the begining of th
-   *
-   * @param expression
-   *
-   * @return {ExpressionBuilder}
-   */
-  public beginsWith(expression: any): ExpressionBuilder {
-    this.beginsWithExpression = this.insertExpression(expression);
-
-    return this;
-  }
-
-  /**
-   * Handle escaping of string characters
-   *
-   * @param {string} string The string to be escaped
-   *
-   * @return {string}
-   */
-  private escapeString(string: string): string {
-    return string.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&').replace(/-/g, '\\u002d');
-  }
-
-  private insertExpression(string: string): string {
-    if (this.isInternalRegex(string)) {
-      return this.formatInternalExpression(string);
+  public followedBy(expression: any, optional: boolean = false): ExpressionBuilder {
+    if (!this.beginsWithExpression.length && !this.getFirstInternalExpression()) {
+      throw new Error('followedBy by must be preceeded by beginsWith or a contains statement');
     }
-    return this.escapeString(string);
+    const validated: string = validateExpression(expression);
+    this.internal.push(handleOptionalWrapping(validated, optional));
+
+    return this;
   }
 
-  private isInternalRegex(string: string): boolean {
-    return (
-      typeof string === 'string' &&
-      string.length > 2 &&
-      string.charAt(0) === '~' &&
-      string.charAt(1) === '~'
-    );
+  public orFollowedBy(expression: any): ExpressionBuilder {
+    if (!this.getLastInternalExpression()) {
+      throw new Error('orFollowedBy by must be preceeded by a followedBy or a contains expression');
+    }
+    const validated: string = validateExpression(expression);
+
+    return this;
   }
 
-  private formatInternalExpression(string: string): string {
-    return string.substring(2);
+  private getLastInternalExpression(): string | null {
+    return this.internal[this.internal.length - 1] || null;
+  }
+
+  private getFirstInternalExpression(): string | null {
+    return this.internal[0] || null;
+  }
+
+  public optionallyEndsWith(expression: string) {
+    return this.endsWith(expression, true);
+  }
+
+  public endsWith(expression: any, optional: boolean = false): ExpressionBuilder {
+    const validated: string = validateExpression(expression);
+
+    this.endsWithExpression = handleOptionalWrapping(validated, optional);
+
+    return this;
+  }
+
+  public optionallyBeginsWith(expression: any) {
+    return this.beginsWith(expression, true);
+  }
+
+  public beginsWith(expression: any, optional: boolean = false): ExpressionBuilder {
+    const validated: string = validateExpression(expression);
+
+    this.beginsWithExpression = handleOptionalWrapping(validated, optional);
+
+    return this;
+  }
+
+  public orBeginsWith(expression: any): ExpressionBuilder {
+    if (!this.beginsWithExpression.length) {
+      throw new Error('orBeginsWith must be preceeded by a beginsWith statement');
+    }
+
+    const validated: string = validateExpression(expression);
+
+    //TODO extract the optional wrapping and reapply?
+    this.beginsWithExpression = wrapOrExpression(this.beginsWithExpression, validated);
+
+    return this;
   }
 }
