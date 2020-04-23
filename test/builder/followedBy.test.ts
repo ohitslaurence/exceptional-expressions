@@ -75,4 +75,22 @@ describe('followedBy test', () => {
     expect(builder.matchesString('2goodbye')).toBeTruthy();
     expect(builder.toRegex()).toEqual(/^\d(?:hello\d)?goodbye/g);
   });
+
+  it('orFollowedBy throws error if no begins with', () => {
+    expect(() => {
+      builder.orFollowedBy('something');
+    }).toThrowError('orFollowedBy by must be preceeded by a followedBy or a contains expression');
+  });
+
+  it('orFollowedBy wraps previous followedBy statements', () => {
+    builder
+      .beginsWith(Sequences.numbers(4))
+      .followedBy('hello')
+      .orFollowedBy('goodbye');
+
+    expect(builder.matchesString('1234hello')).toBeTruthy();
+    expect(builder.matchesString('1234goodbye')).toBeTruthy();
+    expect(builder.matchesString('1234')).toBeFalsy();
+    expect(builder.matchesString('hello')).toBeFalsy();
+  });
 });

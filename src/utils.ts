@@ -1,3 +1,41 @@
+/**
+ * Groups an array of expressions into an OR statement
+ *
+ * @param {Array<any>} expressions The array of expressions
+ *
+ * @return {string}
+ */
+export const or: (expressions: Array<any>) => string = (expressions: Array<any>): string => {
+  if (!Array.isArray(expressions)) {
+    throw new Error('argument for or method must be an array');
+  }
+  if (expressions.length < 2) {
+    throw new Error('array given to or must have at least 2 items');
+  }
+
+  return chainOrExpression(expressions);
+};
+
+/**
+ * Chains an array of expressions into a single OR expression
+ *
+ * @param {Array<any>} expressions The expressions to chain
+ *
+ * @return {string}
+ */
+const chainOrExpression: (expressions: Array<any>) => string = (
+  expressions: Array<any>
+): string => {
+  const orChain: string = expressions.reduce((accumulator, current, index) => {
+    if (index === expressions.length - 1) {
+      return `${accumulator}(?:${validateExpression(current)})`;
+    }
+    return `${accumulator}(?:${validateExpression(current)})|`;
+  }, '');
+
+  return `~~(?:${orChain})`;
+};
+
 export const formatInternalExpression = (string: string): string => {
   return string.substring(2);
 };

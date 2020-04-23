@@ -4,7 +4,8 @@ import {
   matches,
   wrapOptionalExpression,
   wrapOrExpression,
-  validateExpression
+  validateExpression,
+  or
 } from '../../src/utils';
 
 /**
@@ -69,5 +70,23 @@ describe('utils test', () => {
     expect(() => {
       validateExpression(expression);
     }).toThrowError('null is not a valid expression');
+  });
+
+  it('or throws error if not given array', () => {
+    expect(() => {
+      // @ts-ignore
+      or('hello');
+    }).toThrowError('argument for or method must be an array');
+  });
+
+  it('or throws error if length less than 2', () => {
+    expect(() => {
+      or(['hello']);
+    }).toThrowError('array given to or must have at least 2 items');
+  });
+
+  it('or wraps expressions in or statement', () => {
+    const orStatement: string = or(['hello', Sequences.numbers(4), 'goodbye']);
+    expect(orStatement).toEqual('~~(?:(?:hello)|(?:[\\d]{4})|(?:goodbye))');
   });
 });

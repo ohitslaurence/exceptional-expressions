@@ -48,6 +48,12 @@ export default class ExpressionBuilder {
     }
     const validated: string = validateExpression(expression);
 
+    //TODO extract the optional wrapping and reapply?
+    this.internal[this.internal.length - 1] = wrapOrExpression(
+      this.internal[this.internal.length - 1],
+      validated
+    );
+
     return this;
   }
 
