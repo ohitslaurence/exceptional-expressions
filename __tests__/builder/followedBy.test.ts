@@ -1,4 +1,5 @@
 import ExpressionBuilder from '../../src/exceptional-expressions';
+import { or } from '../../src/utils';
 import Constants from '../../src/constants';
 import Sequences from '../../src/sequences';
 
@@ -90,6 +91,21 @@ describe('followedBy test', () => {
 
     expect(builder.matchesString('1234hello')).toBeTruthy();
     expect(builder.matchesString('1234goodbye')).toBeTruthy();
+    expect(builder.matchesString('1234')).toBeFalsy();
+    expect(builder.matchesString('hello')).toBeFalsy();
+  });
+
+  it('can chain orFollowedBy and followedBy with or util', () => {
+    builder
+      .beginsWith(Sequences.numbers(4))
+      .followedBy(or(['(', '|']))
+      .orFollowedBy(or(['goodbye', Constants.number]));
+
+    expect(builder.matchesString('1234(')).toBeTruthy();
+    expect(builder.matchesString('1234|')).toBeTruthy();
+    expect(builder.matchesString('1234goodbye')).toBeTruthy();
+    expect(builder.matchesString('12349')).toBeTruthy();
+    expect(builder.matchesString('1234test')).toBeFalsy();
     expect(builder.matchesString('1234')).toBeFalsy();
     expect(builder.matchesString('hello')).toBeFalsy();
   });

@@ -16,6 +16,31 @@ export const or: (expressions: Array<any>) => string = (expressions: Array<any>)
   return chainOrExpression(expressions);
 };
 
+export const assertExists: <T>(val: T, message?: string) => asserts val is NonNullable<T> = <T>(
+  val: T,
+  message?: string
+): asserts val is NonNullable<T> => {
+  if (val === undefined || val === null) {
+    throw new Error(message);
+  }
+};
+
+export const assertOneExists: <T>(val: Array<T>, message?: string) => asserts val is T[] = <T>(
+  val: Array<T>,
+  message?: string
+): asserts val is T[] => {
+  let exists: boolean = false;
+
+  for (const item of val) {
+    if (item !== undefined && item !== null) {
+      exists = true;
+    }
+  }
+  if (!exists) {
+    throw new Error(message);
+  }
+};
+
 /**
  * Chains an array of expressions into a single OR expression
  *
@@ -132,5 +157,5 @@ export const validateExpression = (expression: any): string => {
     return escapeString(expression.toString());
   }
 
-  throw new Error(`${expression} is not a valid expression`);
+  throw new TypeError(`${expression} is not a valid expression`);
 };

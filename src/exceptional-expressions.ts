@@ -1,8 +1,20 @@
-import { matches, handleOptionalWrapping, validateExpression, wrapOrExpression } from './utils';
+import {
+  matches,
+  handleOptionalWrapping,
+  validateExpression,
+  wrapOrExpression,
+  assertExists,
+  assertOneExists,
+} from './utils';
 export default class ExpressionBuilder {
-  private beginsWithExpression: string = '';
+  private beginsWithExpression: string | null = null;
   private internal: Array<string> = [];
-  private endsWithExpression: string = '';
+  private endsWithExpression: string | null = null;
+  private modifiers: string;
+
+  public constructor(modifiers: string = 'g') {
+    this.modifiers = modifiers;
+  }
 
   public matchesString(string: string): boolean {
     return matches(string, this.buildExpression());
@@ -12,18 +24,22 @@ export default class ExpressionBuilder {
     return this.buildExpression();
   }
 
+  public getModifiers(): Array<string> {
+    return this.modifiers.split('') || [];
+  }
+
   public reset(): void {
-    this.beginsWithExpression = '';
-    this.endsWithExpression = '';
+    this.beginsWithExpression = null;
+    this.endsWithExpression = null;
     this.internal = [];
   }
 
   private buildExpression(): RegExp {
-    const start: string = this.beginsWithExpression.length ? `^${this.beginsWithExpression}` : '';
+    const start: string = this.beginsWithExpression ? `^${this.beginsWithExpression}` : '';
     const internal: string = this.internal.reduce((total, expression) => {
       return total + expression;
     }, '');
-    const end: string = this.endsWithExpression.length ? `${this.endsWithExpression}$` : '';
+    const end: string = this.endsWithExpression ? `${this.endsWithExpression}$` : '';
 
     return new RegExp(`${start}${internal}${end}`, 'g');
   }
@@ -33,9 +49,11 @@ export default class ExpressionBuilder {
   }
 
   public followedBy(expression: any, optional: boolean = false): ExpressionBuilder {
-    if (!this.beginsWithExpression.length && !this.getFirstInternalExpression()) {
-      throw new Error('followedBy by must be preceeded by beginsWith or a contains statement');
-    }
+    assertOneExists<string | null>(
+      [this.beginsWithExpression, this.getFirstInternalExpression()],
+      'followedBy by must be preceeded by beginsWith or a contains statement'
+    );
+
     const validated: string = validateExpression(expression);
     this.internal.push(handleOptionalWrapping(validated, optional));
 
@@ -43,9 +61,11 @@ export default class ExpressionBuilder {
   }
 
   public orFollowedBy(expression: any): ExpressionBuilder {
-    if (!this.getLastInternalExpression()) {
-      throw new Error('orFollowedBy by must be preceeded by a followedBy or a contains expression');
-    }
+    assertExists<string | null>(
+      this.getLastInternalExpression(),
+      'orFollowedBy by must be preceeded by a followedBy or a contains expression'
+    );
+
     const validated: string = validateExpression(expression);
 
     //TODO extract the optional wrapping and reapply?
@@ -77,6 +97,8 @@ export default class ExpressionBuilder {
     return this;
   }
 
+  public orEndsWith() {}
+
   public optionallyBeginsWith(expression: any) {
     return this.beginsWith(expression, true);
   }
@@ -90,9 +112,10 @@ export default class ExpressionBuilder {
   }
 
   public orBeginsWith(expression: any): ExpressionBuilder {
-    if (!this.beginsWithExpression.length) {
-      throw new Error('orBeginsWith must be preceeded by a beginsWith statement');
-    }
+    assertExists<string | null>(
+      this.beginsWithExpression,
+      'orBeginsWith must be preceeded by a beginsWith statement'
+    );
 
     const validated: string = validateExpression(expression);
 
