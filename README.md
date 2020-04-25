@@ -15,7 +15,7 @@
 
 <p align="center">
   <b>An incredible way to build efficient, concise and human readable regular expressions.</b></br>
-  <sub>Made with ❤️ by <a href="https://github.com/ohitlaurence">ohitslaurence</a></sub>
+  <sub>Made with ❤️ by <a href="https://github.com/ohitslaurence">ohitslaurence</a></sub>
 </p>
 
 <br />
