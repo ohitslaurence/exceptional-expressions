@@ -5,7 +5,7 @@
 <h1 align="center">Regex Expression Builder</h2>
 
 <p align="center">
-  <a href="https://david-dm.org/ohitslaurence/exceptional-expressionse">
+  <a href="https://david-dm.org/ohitslaurence/exceptional-expressions">
     <img src="https://david-dm.org/ohitslaurence/exceptional-expressions/status.svg?style=flat" alt="dependency" />
   </a>
   <a href="https://travis-ci.org/ohitslaurence/exceptional-expressions">
@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <b>An incredible way to build regular expressions in an efficient, concise and human readable way.</b></br>
+  <b>An incredible way to build efficient, concise and human readable regular expressions.</b></br>
   <sub>Made with ❤️ by <a href="https://github.com/ohitlaurence">ohitslaurence</a></sub>
 </p>
 
