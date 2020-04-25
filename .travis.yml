@@ -4,4 +4,7 @@ node_js:
 before_script:
   - yarn install
 script:
+  - npm install codecov -g
   - yarn test
+after_success:
+  - codecov
