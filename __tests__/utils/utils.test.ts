@@ -1,4 +1,5 @@
 import Sequences from '../../src/sequences';
+import Constants from '../../src/constants';
 import {
   escapeString,
   matches,
@@ -8,6 +9,7 @@ import {
   or,
   validateFlags,
   getGroupsByIndex,
+  anyOf,
 } from '../../src/utils';
 
 /**
@@ -113,5 +115,23 @@ describe('utils test', () => {
     const regex: RegExp = /(?:^|\s)underscore_(.*?)(?:\s|$)/g;
 
     expect(getGroupsByIndex(string, regex)).toEqual(['blue', 'green', 'yellow']);
+  });
+
+  it('anyOf throws error if not given array', () => {
+    expect(() => {
+      // @ts-ignore
+      anyOf('hello');
+    }).toThrowError('argument for anyOf method must be an array');
+  });
+
+  it('anyOf throws error if length less than 2', () => {
+    expect(() => {
+      anyOf(['hello']);
+    }).toThrowError('array given to anyOf must have at least 2 items');
+  });
+
+  it('anyOf wraps expressions in anyOf statement', () => {
+    const orStatement: string = anyOf(['H', Constants.number, 'W']);
+    expect(orStatement).toEqual('~~(?:[H\\dW])');
   });
 });

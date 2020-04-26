@@ -1,6 +1,24 @@
 const FLAGS: string[] = ['i', 'g', 'm', 's', 'u', 'y'];
 
 /**
+ * Groups an array of expressions into an anyOf statement
+ *
+ * @param {Array<any>} expressions The array of expressions
+ *
+ * @return {string}
+ */
+export const anyOf: (expressions: Array<any>) => string = (expressions: Array<any>): string => {
+  if (!Array.isArray(expressions)) {
+    throw new Error('argument for anyOf method must be an array');
+  }
+  if (expressions.length < 2) {
+    throw new Error('array given to anyOf must have at least 2 items');
+  }
+
+  return `~~(?:[${validateExpression(expressions)}])`;
+};
+
+/**
  * Groups an array of expressions into an OR statement
  *
  * @param {Array<any>} expressions The array of expressions
@@ -206,17 +224,9 @@ export const extractMatchesWithGroup = (
   regex: RegExp,
   groups: Array<string | number>
 ): IGroupings[] => {
-  let matchCount: number = 0;
-  const extractions: Array<string>[] = [];
+  const extractions: Array<string>[] = extractAllMatches(string, regex);
+  const matchCount: number = extractions[0].length;
   const groupings: IGroupings[] = [];
-
-  for (let index = 0; index < groups.length + 1; index++) {
-    const matches = getGroupsByIndex(string, regex, index);
-    if (index === 0) {
-      matchCount = matches.length;
-    }
-    extractions.push(matches);
-  }
 
   for (let i = 0; i < matchCount; i++) {
     const group: IGroupings = {
@@ -230,6 +240,17 @@ export const extractMatchesWithGroup = (
   }
 
   return groupings;
+};
+
+const extractAllMatches = (string: string, regex: RegExp) => {
+  const matches: Array<string[]> = [];
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(string))) {
+    match.forEach((item, index) => {
+      matches[index] = matches[index] ? [...matches[index], item] : [item];
+    });
+  }
+  return matches;
 };
 
 export const getGroupsByIndex = (
