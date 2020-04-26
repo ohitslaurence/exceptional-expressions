@@ -12,10 +12,10 @@
     <img src="https://travis-ci.org/ohitslaurence/exceptional-expressions.svg?branch=master" alt="travis" />
     </a>
    <a href="https://www.npmjs.com/package/exceptional-expressions">
-    <img src="https://img.shields.io/npm/v/exceptional-expressions?color=blue" alt="travis" />
+    <img src="https://img.shields.io/npm/v/exceptional-expressions?color=blue" alt="npm" />
     </a>
     <a href="https://codecov.io/gh/ohitslaurence/exceptional-expressions">
-    <img src="https://codecov.io/gh/ohitslaurence/exceptional-expressions/branch/master/graph/badge.svg" alt="travis" />
+    <img src="https://codecov.io/gh/ohitslaurence/exceptional-expressions/branch/master/graph/badge.svg" alt="codecov" />
     </a>
 </p>
 

@@ -5,7 +5,8 @@ import {
   wrapOptionalExpression,
   wrapOrExpression,
   validateExpression,
-  or
+  or,
+  validateFlags,
 } from '../../src/utils';
 
 /**
@@ -88,5 +89,11 @@ describe('utils test', () => {
   it('or wraps expressions in or statement', () => {
     const orStatement: string = or(['hello', Sequences.numbers(4), 'goodbye']);
     expect(orStatement).toEqual('~~(?:(?:hello)|(?:[\\d]{4})|(?:goodbye))');
+  });
+
+  it('correctly validates flasgs', () => {
+    expect(validateFlags('ig')).toEqual('ig');
+    expect(validateFlags('igxd')).toEqual('ig');
+    expect(validateFlags('iGxd')).toEqual('ig');
   });
 });

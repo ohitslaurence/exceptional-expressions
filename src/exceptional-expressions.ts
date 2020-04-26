@@ -6,15 +6,16 @@ import {
   assertExists,
   assertOneExists,
   assertDoesntExist,
+  validateFlags,
 } from './utils';
 export default class ExpressionBuilder {
   private beginsWithExpression: string | null = null;
   private internal: Array<string> = [];
   private endsWithExpression: string | null = null;
-  private modifiers: string;
+  private flags: string;
 
-  public constructor(modifiers: string = 'g') {
-    this.modifiers = modifiers;
+  public constructor(flags: string = 'g') {
+    this.flags = validateFlags(flags);
   }
 
   public matchesString(string: string): boolean {
@@ -25,8 +26,8 @@ export default class ExpressionBuilder {
     return this.buildExpression();
   }
 
-  public getModifiers(): Array<string> {
-    return this.modifiers.split('');
+  public getFlags(): Array<string> {
+    return this.flags.split('');
   }
 
   public reset(): void {
@@ -42,7 +43,7 @@ export default class ExpressionBuilder {
     }, '');
     const end: string = this.endsWithExpression ? `${this.endsWithExpression}$` : '';
 
-    return new RegExp(`${start}${internal}${end}`, this.modifiers);
+    return new RegExp(`${start}${internal}${end}`, this.flags);
   }
 
   public contains(expression: any): ExpressionBuilder {

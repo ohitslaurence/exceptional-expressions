@@ -1,3 +1,5 @@
+const FLAGS: string[] = ['i', 'g', 'm', 's', 'u', 'y'];
+
 /**
  * Groups an array of expressions into an OR statement
  *
@@ -14,6 +16,22 @@ export const or: (expressions: Array<any>) => string = (expressions: Array<any>)
   }
 
   return chainOrExpression(expressions);
+};
+
+/**
+ * Validate that flags passed match the valid javascript regex flags
+ *
+ * @param {string} flags
+ *
+ * @return {string}
+ */
+export const validateFlags: (flags: string) => string = (flags: string): string => {
+  return flags.split('').reduce((acc: string, curr: string) => {
+    if (FLAGS.includes(curr.toLowerCase())) {
+      return `${acc}${curr.toLowerCase()}`;
+    }
+    return acc;
+  }, '');
 };
 
 /**
@@ -36,6 +54,12 @@ export const assertDoesntExist: (val: any, message?: string) => asserts val is n
   }
 };
 
+/**
+ * Asser that the value passed is not null or undefined
+ *
+ * @param {T} val
+ * @param {string} message
+ */
 export const assertExists: <T>(val: T, message?: string) => asserts val is NonNullable<T> = <T>(
   val: T,
   message?: string
@@ -45,20 +69,22 @@ export const assertExists: <T>(val: T, message?: string) => asserts val is NonNu
   }
 };
 
+/**
+ * Assert that at least one of the values passed is not null or undefined
+ *
+ * @param {Array<T>} val
+ * @param {string} message
+ */
 export const assertOneExists: <T>(val: Array<T>, message?: string) => asserts val is T[] = <T>(
   val: Array<T>,
   message?: string
 ): asserts val is T[] => {
-  let exists: boolean = false;
-
   for (const item of val) {
     if (item !== undefined && item !== null) {
-      exists = true;
+      return;
     }
   }
-  if (!exists) {
-    throw new Error(message);
-  }
+  throw new Error(message);
 };
 
 /**
@@ -71,12 +97,15 @@ export const assertOneExists: <T>(val: Array<T>, message?: string) => asserts va
 const chainOrExpression: (expressions: Array<any>) => string = (
   expressions: Array<any>
 ): string => {
-  const orChain: string = expressions.reduce((accumulator, current, index) => {
-    if (index === expressions.length - 1) {
-      return `${accumulator}(?:${validateExpression(current)})`;
-    }
-    return `${accumulator}(?:${validateExpression(current)})|`;
-  }, '');
+  const orChain: string = expressions.reduce(
+    (accumulator: string, current: string, index: number) => {
+      if (index === expressions.length - 1) {
+        return `${accumulator}(?:${validateExpression(current)})`;
+      }
+      return `${accumulator}(?:${validateExpression(current)})|`;
+    },
+    ''
+  );
 
   return `~~(?:${orChain})`;
 };
