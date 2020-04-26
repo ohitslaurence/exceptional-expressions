@@ -5,6 +5,7 @@ import {
   wrapOrExpression,
   assertExists,
   assertOneExists,
+  assertDoesntExist,
 } from './utils';
 export default class ExpressionBuilder {
   private beginsWithExpression: string | null = null;
@@ -25,7 +26,7 @@ export default class ExpressionBuilder {
   }
 
   public getModifiers(): Array<string> {
-    return this.modifiers.split('') || [];
+    return this.modifiers.split('');
   }
 
   public reset(): void {
@@ -41,7 +42,35 @@ export default class ExpressionBuilder {
     }, '');
     const end: string = this.endsWithExpression ? `${this.endsWithExpression}$` : '';
 
-    return new RegExp(`${start}${internal}${end}`, 'g');
+    return new RegExp(`${start}${internal}${end}`, this.modifiers);
+  }
+
+  public contains(expression: any): ExpressionBuilder {
+    assertDoesntExist(
+      this.getFirstInternalExpression(),
+      'contains can only be used as the first internal expression'
+    );
+
+    const validated: string = validateExpression(expression);
+    this.internal.push(validated);
+
+    return this;
+  }
+
+  public orContains(expression: any): ExpressionBuilder {
+    assertExists<string | null>(
+      this.getLastInternalExpression(),
+      'orContains by must be preceeded by a contains expression'
+    );
+
+    const validated: string = validateExpression(expression);
+
+    this.internal[this.internal.length - 1] = wrapOrExpression(
+      this.internal[this.internal.length - 1],
+      validated
+    );
+
+    return this;
   }
 
   public optionallyFollowedBy(expression: any): ExpressionBuilder {
@@ -68,7 +97,6 @@ export default class ExpressionBuilder {
 
     const validated: string = validateExpression(expression);
 
-    //TODO extract the optional wrapping and reapply?
     this.internal[this.internal.length - 1] = wrapOrExpression(
       this.internal[this.internal.length - 1],
       validated
@@ -97,9 +125,21 @@ export default class ExpressionBuilder {
     return this;
   }
 
-  public orEndsWith() {}
+  public orEndsWith(expression: any): ExpressionBuilder {
+    assertExists<string | null>(
+      this.endsWithExpression,
+      'orEndsWith must be preceeded by a endsWith statement'
+    );
 
-  public optionallyBeginsWith(expression: any) {
+    const validated: string = validateExpression(expression);
+
+    //TODO extract the optional wrapping and reapply?
+    this.endsWithExpression = wrapOrExpression(this.endsWithExpression, validated);
+
+    return this;
+  }
+
+  public optionallyBeginsWith(expression: any): ExpressionBuilder {
     return this.beginsWith(expression, true);
   }
 

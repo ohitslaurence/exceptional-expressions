@@ -25,3 +25,46 @@
 </p>
 
 <br />
+
+## Installing
+
+Using yarn:
+
+```bash
+$ yarn add exceptional-expressions
+```
+
+Using npm:
+
+```bash
+$ npm install exceptional-expressions
+```
+
+Using bower:
+
+```bash
+$ bower install exceptional-expressions
+```
+
+## Hello World
+
+```javascript
+import { ExpBuilder, or, Constants, anythingBut } from 'exceptional-expressions;
+
+const builder = new ExpBuilder('ig');
+
+builder
+  .beginsWith(or(['hello', 'goodbye']))
+  .followedBy(Constants.whitespace)
+  .endsWith(anythingBut('world'));
+
+builder.matchesString('Hello World'); // false
+builder.matchesString('Goodbye Earth'); // true
+builder.matchesString('hello world'); // false
+builder.matchesString('helloearth'); // false
+
+```
+
+## License
+
+[MIT](LICENSE)

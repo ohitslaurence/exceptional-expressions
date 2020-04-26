@@ -16,6 +16,26 @@ export const or: (expressions: Array<any>) => string = (expressions: Array<any>)
   return chainOrExpression(expressions);
 };
 
+/**
+ * Groups an array of expressions into an OR statement
+ *
+ * @param {Array<any>} expressions The array of expressions
+ *
+ * @return {string}
+ */
+export const anythingBut: (expression: any) => string = (expression: any): string => {
+  return `~~(?:(?:(?!${validateExpression(expression)}).)*)`;
+};
+
+export const assertDoesntExist: (val: any, message?: string) => asserts val is null | undefined = (
+  val: any,
+  message?: string
+): asserts val is null | undefined => {
+  if (!(val === undefined || val === null)) {
+    throw new Error(message);
+  }
+};
+
 export const assertExists: <T>(val: T, message?: string) => asserts val is NonNullable<T> = <T>(
   val: T,
   message?: string

@@ -42,11 +42,25 @@ describe('endsWith test', () => {
     expect(builder.matchesString('nd some more strings')).toBeTruthy();
   });
 
-  it('optionallyBeginsWith returns endsWith with optional = true', () => {
+  it('optionallyEndsWith returns endsWith with optional = true', () => {
     builder.optionallyEndsWith(Sequences.numbers(4));
 
     expect(builder.matchesString('hello 1234')).toBeTruthy();
     expect(builder.matchesString('nd some more strings')).toBeTruthy();
     expect(builder.toRegex()).toEqual(/(?:[\d]{4})?$/g);
+  });
+
+  it('orEndsWith throws error if no begins with', () => {
+    expect(() => {
+      builder.orEndsWith('something');
+    }).toThrowError('orEndsWith must be preceeded by a endsWith statement');
+  });
+
+  it('orEndsWith wraps end statements', () => {
+    builder.endsWith(Sequences.numbers(4)).orEndsWith('hello');
+
+    expect(builder.matchesString('test 1234')).toBeTruthy();
+    expect(builder.matchesString('test hello')).toBeTruthy();
+    expect(builder.matchesString('test')).toBeFalsy();
   });
 });
