@@ -122,6 +122,7 @@ describe('followedBy test', () => {
       .followedBy('goodbye');
 
     expect(builder.matchesString('2helloyessmile2!goodbye')).toBeTruthy();
+    expect(builder.matchesString('2helloyessmile2!goodbye')).toBeTruthy();
     expect(builder.matchesString('hellogoodbye')).toBeFalsy();
   });
 });

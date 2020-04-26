@@ -33,6 +33,9 @@ export const group: (expression: any, group?: string) => string = (
   return `~~[|${group}|](${validateExpression(expression)})[|${group}|]`;
 };
 
+/**
+ * Generate a random string of length 4
+ */
 const randomString = (): string => {
   return Math.random().toString(36).substring(2, 4) + Math.random().toString(36).substring(2, 4);
 };
@@ -64,6 +67,12 @@ export const anythingBut: (expression: any) => string = (expression: any): strin
   return `~~(?:(?:(?!${validateExpression(expression)}).)*)`;
 };
 
+/**
+ * Assert that a value passed equals either null or undefined
+ *
+ * @param {any} val
+ * @param {string} message
+ */
 export const assertDoesntExist: (val: any, message?: string) => asserts val is null | undefined = (
   val: any,
   message?: string
@@ -181,6 +190,46 @@ export const extractMatches: (string: string, regex: RegExp) => Array<string> = 
   regex: RegExp
 ): Array<string> => {
   return getGroupsByIndex(string, regex, 0);
+};
+
+export interface IGroupings {
+  match: string;
+  groups: IGroup;
+}
+
+interface IGroup {
+  [key: string]: string;
+}
+
+export const extractMatchesWithGroup = (
+  string: string,
+  regex: RegExp,
+  groups: Array<string | number>
+): IGroupings[] => {
+  let matchCount: number = 0;
+  const extractions: Array<string>[] = [];
+  const groupings: IGroupings[] = [];
+
+  for (let index = 0; index < groups.length + 1; index++) {
+    const matches = getGroupsByIndex(string, regex, index);
+    if (index === 0) {
+      matchCount = matches.length;
+    }
+    extractions.push(matches);
+  }
+
+  for (let i = 0; i < matchCount; i++) {
+    const group: IGroupings = {
+      match: extractions[0][i],
+      groups: {},
+    };
+    for (let j = 1; j < extractions.length; j++) {
+      group.groups[groups[j - 1]] = extractions[j][i];
+    }
+    groupings.push(group);
+  }
+
+  return groupings;
 };
 
 export const getGroupsByIndex = (

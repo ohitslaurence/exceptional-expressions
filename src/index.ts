@@ -1,4 +1,4 @@
 import ExpBuilder from './exceptional-expressions';
-import { or } from './utils';
+import { or, anythingBut, group } from './utils';
 
-export { ExpBuilder, or };
+export { ExpBuilder, or, anythingBut, group };

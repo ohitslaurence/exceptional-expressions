@@ -8,6 +8,8 @@ import {
   assertDoesntExist,
   validateFlags,
   extractMatches,
+  extractMatchesWithGroup,
+  IGroupings,
 } from './utils';
 export default class ExpressionBuilder {
   private beginsWithExpression: string | null = null;
@@ -28,11 +30,15 @@ export default class ExpressionBuilder {
     return extractMatches(string, this.buildExpression()).length;
   }
 
-  public getMatches(string: string): RegExpMatchArray {
+  public getMatches(string: string): Array<string> {
     return extractMatches(string, this.buildExpression());
   }
 
-  public getCaptureGroups() {
+  public getMatchesWithGroups(string: string): IGroupings[] {
+    return extractMatchesWithGroup(string, this.buildExpression(), this.getCaptureGroups());
+  }
+
+  public getCaptureGroups(): Array<string | number> {
     return this.groups.map((group, index) => (group.startsWith('__') ? index + 1 : group));
   }
 
@@ -48,6 +54,7 @@ export default class ExpressionBuilder {
     this.beginsWithExpression = null;
     this.endsWithExpression = null;
     this.internal = [];
+    this.groups = [];
   }
 
   private buildExpression(): RegExp {
@@ -67,7 +74,7 @@ export default class ExpressionBuilder {
     );
 
     const validated: string = validateExpression(expression);
-    this.internal.push(validated);
+    this.internal.push(this.handleInternalTransformation(validated));
 
     return this;
   }
@@ -80,9 +87,8 @@ export default class ExpressionBuilder {
 
     const validated: string = validateExpression(expression);
 
-    this.internal[this.internal.length - 1] = wrapOrExpression(
-      this.internal[this.internal.length - 1],
-      validated
+    this.internal[this.internal.length - 1] = this.handleInternalTransformation(
+      wrapOrExpression(this.internal[this.internal.length - 1], validated)
     );
 
     return this;
@@ -99,7 +105,9 @@ export default class ExpressionBuilder {
     );
 
     const validated: string = validateExpression(expression);
-    this.internal.push(this.extractInternalGroups(handleOptionalWrapping(validated, optional)));
+    this.internal.push(
+      this.handleInternalTransformation(handleOptionalWrapping(validated, optional))
+    );
 
     return this;
   }
@@ -112,9 +120,8 @@ export default class ExpressionBuilder {
 
     const validated: string = validateExpression(expression);
 
-    this.internal[this.internal.length - 1] = wrapOrExpression(
-      this.internal[this.internal.length - 1],
-      validated
+    this.internal[this.internal.length - 1] = this.handleInternalTransformation(
+      wrapOrExpression(this.internal[this.internal.length - 1], validated)
     );
 
     return this;
@@ -135,7 +142,9 @@ export default class ExpressionBuilder {
   public endsWith(expression: any, optional: boolean = false): ExpressionBuilder {
     const validated: string = validateExpression(expression);
 
-    this.endsWithExpression = handleOptionalWrapping(validated, optional);
+    this.endsWithExpression = this.handleInternalTransformation(
+      handleOptionalWrapping(validated, optional)
+    );
 
     return this;
   }
@@ -149,7 +158,9 @@ export default class ExpressionBuilder {
     const validated: string = validateExpression(expression);
 
     //TODO extract the optional wrapping and reapply?
-    this.endsWithExpression = wrapOrExpression(this.endsWithExpression, validated);
+    this.endsWithExpression = this.handleInternalTransformation(
+      wrapOrExpression(this.endsWithExpression, validated)
+    );
 
     return this;
   }
@@ -161,7 +172,9 @@ export default class ExpressionBuilder {
   public beginsWith(expression: any, optional: boolean = false): ExpressionBuilder {
     const validated: string = validateExpression(expression);
 
-    this.beginsWithExpression = handleOptionalWrapping(validated, optional);
+    this.beginsWithExpression = this.handleInternalTransformation(
+      handleOptionalWrapping(validated, optional)
+    );
 
     return this;
   }
@@ -172,12 +185,18 @@ export default class ExpressionBuilder {
       'orBeginsWith must be preceeded by a beginsWith statement'
     );
 
-    const validated: string = validateExpression(expression);
+    const validated: string = this.handleInternalTransformation(validateExpression(expression));
 
     //TODO extract the optional wrapping and reapply?
-    this.beginsWithExpression = wrapOrExpression(this.beginsWithExpression, validated);
+    this.beginsWithExpression = this.handleInternalTransformation(
+      wrapOrExpression(this.beginsWithExpression, validated)
+    );
 
     return this;
+  }
+
+  private handleInternalTransformation(expression: any): string {
+    return this.extractInternalGroups(expression);
   }
 
   private extractInternalGroups(expression: string): string {
