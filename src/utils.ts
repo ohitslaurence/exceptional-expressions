@@ -19,6 +19,25 @@ export const or: (expressions: Array<any>) => string = (expressions: Array<any>)
 };
 
 /**
+ * Wraps the expression with a regex grouping
+ *
+ * @param {any} expression The expression to be wrapped
+ * @param {string} group The optional name of the group
+ *
+ * @return {string}
+ */
+export const group: (expression: any, group?: string) => string = (
+  expression: any,
+  group: string = `__${randomString()}`
+): string => {
+  return `~~[|${group}|](${validateExpression(expression)})[|${group}|]`;
+};
+
+const randomString = (): string => {
+  return Math.random().toString(36).substring(2, 4) + Math.random().toString(36).substring(2, 4);
+};
+
+/**
  * Validate that flags passed match the valid javascript regex flags
  *
  * @param {string} flags
@@ -110,6 +129,13 @@ const chainOrExpression: (expressions: Array<any>) => string = (
   return `~~(?:${orChain})`;
 };
 
+/**
+ * Handles remove the internal expression indicator
+ *
+ * @param {string} string
+ *
+ * @return {string}
+ */
 export const formatInternalExpression = (string: string): string => {
   return string.substring(2);
 };
@@ -140,6 +166,34 @@ export const matches: (string: string, regex: RegExp) => boolean = (
   const match: RegExpMatchArray | null = string.match(regex);
 
   return match && match.length > 0 ? true : false;
+};
+
+/**
+ * Extract an array of matches from the string
+ *
+ * @param {string} string
+ * @param {RegExp} regex
+ *
+ * @return {Array<string>}
+ */
+export const extractMatches: (string: string, regex: RegExp) => Array<string> = (
+  string: string,
+  regex: RegExp
+): Array<string> => {
+  return getGroupsByIndex(string, regex, 0);
+};
+
+export const getGroupsByIndex = (
+  string: string,
+  regex: RegExp,
+  index: number = 1
+): Array<string> => {
+  const matches: Array<string> = [];
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(string))) {
+    matches.push(match[index]);
+  }
+  return matches;
 };
 
 /**

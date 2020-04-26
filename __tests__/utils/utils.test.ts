@@ -7,6 +7,7 @@ import {
   validateExpression,
   or,
   validateFlags,
+  getGroupsByIndex,
 } from '../../src/utils';
 
 /**
@@ -95,5 +96,22 @@ describe('utils test', () => {
     expect(validateFlags('ig')).toEqual('ig');
     expect(validateFlags('igxd')).toEqual('ig');
     expect(validateFlags('iGxd')).toEqual('ig');
+  });
+
+  it('getGroupsByIndex correctly extracts groups by index', () => {
+    const string: string = 'test hello and goodbye and yes I am a test hello and goodbye and yes';
+    const regex: RegExp = /test (hello) and (goodbye) and (yes)/g;
+
+    expect(getGroupsByIndex(string, regex)).toEqual(['hello', 'hello']);
+    expect(getGroupsByIndex(string, regex, 2)).toEqual(['goodbye', 'goodbye']);
+    expect(getGroupsByIndex(string, regex, 3)).toEqual(['yes', 'yes']);
+  });
+
+  it('getGroupsByIndex extracts single group for multiple matches', () => {
+    const string: string =
+      'something underscore_blue something underscore_green something underscore_yellow';
+    const regex: RegExp = /(?:^|\s)underscore_(.*?)(?:\s|$)/g;
+
+    expect(getGroupsByIndex(string, regex)).toEqual(['blue', 'green', 'yellow']);
   });
 });

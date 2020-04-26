@@ -7,12 +7,14 @@ import {
   assertOneExists,
   assertDoesntExist,
   validateFlags,
+  extractMatches,
 } from './utils';
 export default class ExpressionBuilder {
   private beginsWithExpression: string | null = null;
   private internal: Array<string> = [];
   private endsWithExpression: string | null = null;
   private flags: string;
+  private groups: Array<string> = [];
 
   public constructor(flags: string = 'g') {
     this.flags = validateFlags(flags);
@@ -20,6 +22,18 @@ export default class ExpressionBuilder {
 
   public matchesString(string: string): boolean {
     return matches(string, this.buildExpression());
+  }
+
+  public countMatches(string: string): number {
+    return extractMatches(string, this.buildExpression()).length;
+  }
+
+  public getMatches(string: string): RegExpMatchArray {
+    return extractMatches(string, this.buildExpression());
+  }
+
+  public getCaptureGroups() {
+    return this.groups.map((group, index) => (group.startsWith('__') ? index + 1 : group));
   }
 
   public toRegex(): RegExp {
@@ -85,7 +99,7 @@ export default class ExpressionBuilder {
     );
 
     const validated: string = validateExpression(expression);
-    this.internal.push(handleOptionalWrapping(validated, optional));
+    this.internal.push(this.extractInternalGroups(handleOptionalWrapping(validated, optional)));
 
     return this;
   }
@@ -164,5 +178,16 @@ export default class ExpressionBuilder {
     this.beginsWithExpression = wrapOrExpression(this.beginsWithExpression, validated);
 
     return this;
+  }
+
+  private extractInternalGroups(expression: string): string {
+    const groupRx: RegExp = /(\[\|([a-z0-9A-Z_-]+)\|\])(.*)(\[\|\2\|\])/;
+    let transformed: string = expression;
+    while (matches(transformed, groupRx)) {
+      const group: RegExpExecArray = groupRx.exec(transformed) as RegExpExecArray;
+      transformed = transformed.replace(groupRx, '$3');
+      this.groups.push(group[2]);
+    }
+    return transformed;
   }
 }

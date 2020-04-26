@@ -1,5 +1,5 @@
 import ExpressionBuilder from '../../src/exceptional-expressions';
-import { or } from '../../src/utils';
+import { or, group } from '../../src/utils';
 import Constants from '../../src/constants';
 import Sequences from '../../src/sequences';
 
@@ -84,10 +84,7 @@ describe('followedBy test', () => {
   });
 
   it('orFollowedBy wraps previous followedBy statements', () => {
-    builder
-      .beginsWith(Sequences.numbers(4))
-      .followedBy('hello')
-      .orFollowedBy('goodbye');
+    builder.beginsWith(Sequences.numbers(4)).followedBy('hello').orFollowedBy('goodbye');
 
     expect(builder.matchesString('1234hello')).toBeTruthy();
     expect(builder.matchesString('1234goodbye')).toBeTruthy();
@@ -108,5 +105,23 @@ describe('followedBy test', () => {
     expect(builder.matchesString('1234test')).toBeFalsy();
     expect(builder.matchesString('1234')).toBeFalsy();
     expect(builder.matchesString('hello')).toBeFalsy();
+  });
+
+  it('capture groups implemented correctly', () => {
+    builder
+      .beginsWith(Constants.number)
+      .followedBy(
+        group(
+          [
+            group([group(['hello', 'yes'], 'third'), 'smile']),
+            [group(Constants.number, 'fourth'), Constants.symbol],
+          ],
+          'first'
+        )
+      )
+      .followedBy('goodbye');
+
+    expect(builder.matchesString('2helloyessmile2!goodbye')).toBeTruthy();
+    expect(builder.matchesString('hellogoodbye')).toBeFalsy();
   });
 });
