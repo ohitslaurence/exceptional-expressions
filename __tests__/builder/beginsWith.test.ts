@@ -6,7 +6,7 @@ import Sequences from '../../src/sequences';
  * beginsWith test
  */
 describe('beginsWith test', () => {
-  let builder: ExpressionBuilder = new ExpressionBuilder();
+  let builder: ExpressionBuilder = new ExpressionBuilder('g');
 
   beforeEach(() => {
     builder.reset();

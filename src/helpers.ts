@@ -132,6 +132,20 @@ export const extractMatchesWithGroup = (
   return groupings;
 };
 
+export const extractMatchesByGroup = (
+  string: string,
+  group: string | number,
+  regex: RegExp,
+  groups: Array<string | number>
+): Array<string> => {
+  const extractions: Array<string>[] = extractAllMatches(string, regex);
+  const groupIndex = groups.indexOf(group);
+
+  if (groupIndex === -1) return [];
+
+  return extractions[groupIndex + 1];
+};
+
 const extractAllMatches = (string: string, regex: RegExp) => {
   const matches: Array<string[]> = [];
   let match: RegExpExecArray | null;

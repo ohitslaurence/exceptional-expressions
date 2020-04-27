@@ -6,6 +6,7 @@ import {
   validateFlags,
   extractMatches,
   extractMatchesWithGroup,
+  extractMatchesByGroup,
   IGroupings,
 } from './helpers';
 
@@ -36,6 +37,10 @@ export default class ExpressionBuilder {
 
   public getMatchesWithGroups(string: string): IGroupings[] {
     return extractMatchesWithGroup(string, this.buildExpression(), this.getCaptureGroups());
+  }
+
+  public getMatchesByGroup(string: string, group: string | number): string[] {
+    return extractMatchesByGroup(string, group, this.buildExpression(), this.getCaptureGroups());
   }
 
   public getCaptureGroups(): Array<string | number> {

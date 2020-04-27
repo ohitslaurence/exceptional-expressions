@@ -1,6 +1,6 @@
 {
   "name": "exceptional-expressions",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "An incredible way to build efficient, concise and human readable regular expressions.",
   "keywords": [
     "typescript",
