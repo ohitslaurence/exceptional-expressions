@@ -1,16 +1,15 @@
 import Sequences from '../../src/sequences';
 import Constants from '../../src/constants';
+import { or, anyOf } from '../../src/utils';
 import {
   escapeString,
   matches,
   wrapOptionalExpression,
   wrapOrExpression,
   validateExpression,
-  or,
   validateFlags,
   getGroupsByIndex,
-  anyOf,
-} from '../../src/utils';
+} from '../../src/helpers';
 
 /**
  * beginsWith test

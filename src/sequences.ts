@@ -1,5 +1,5 @@
 import Constants from './constants';
-import { formatInternalExpression } from './utils';
+import { formatInternalExpression } from './helpers';
 
 const validateParameters: (params: ISequenceParams | any) => void = (params: ISequenceParams) => {
   if (!isSequenceParam(params) && !Number.isInteger(<any>params)) {
@@ -134,5 +134,5 @@ export default {
     }
 
     return sequenceByBounds(params, expression, false);
-  }
+  },
 };

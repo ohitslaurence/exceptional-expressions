@@ -1,5 +1,5 @@
 import Constants from '../../src/constants';
-import { formatInternalExpression } from '../../src/utils';
+import { formatInternalExpression } from '../../src/helpers';
 
 /**
  * anything constant test

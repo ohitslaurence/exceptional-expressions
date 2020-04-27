@@ -3,14 +3,14 @@ import {
   handleOptionalWrapping,
   validateExpression,
   wrapOrExpression,
-  assertExists,
-  assertOneExists,
-  assertDoesntExist,
   validateFlags,
   extractMatches,
   extractMatchesWithGroup,
   IGroupings,
-} from './utils';
+} from './helpers';
+
+import { assertExists, assertOneExists, assertDoesntExist } from './assertions';
+
 export default class ExpressionBuilder {
   private beginsWithExpression: string | null = null;
   private internal: Array<string> = [];

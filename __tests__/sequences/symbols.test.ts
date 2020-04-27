@@ -1,6 +1,6 @@
 import Sequences from '../../src/sequences';
 import Constants from '../../src/constants';
-import { formatInternalExpression } from '../../src/utils';
+import { formatInternalExpression } from '../../src/helpers';
 
 /**
  * symbols sequence test
